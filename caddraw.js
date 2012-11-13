@@ -1,4 +1,5 @@
 (function(window, $, Raphael, undefined) {
+"use strict";
 var 
     // Sandboxing, because lets steal all of jQuery's ideas bceause why not
     document = window.document,
@@ -19,7 +20,7 @@ var
         // This is a object that represents the active element;  either the one that is selected,
         // the one that is being moved, or the one that is controlling the creation prameters.
         this.activeElement = {
-            type: "none",
+            type: "none"
         };
 
         // This stores Raphael sets of elements of each type (lines, points, arcs).
@@ -29,7 +30,6 @@ var
 // We need to make sure that Arrays have an indexOf method. *sigh*, IE.
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
-        "use strict";
         if (this == null) {
             throw new TypeError();
         }
@@ -57,7 +57,7 @@ if (!Array.prototype.indexOf) {
             }
         }
         return -1;
-    }
+    };
 }
 
 // Lets setup the CAD prototype.
@@ -73,8 +73,8 @@ CAD.prototype = {
             // Create the event object and bind ourselves to handle it.
             this.events[event] = {};
             // key events require element focus, so we have to do some sort of hack :/
-            if (event == "keyup" || event == "keydown" || event == "keypress") {
-                $(document).bind(event+".CAD", this.getHandler())
+            if (event === "keyup" || event === "keydown" || event === "keypress") {
+                $(document).bind(event+".CAD", this.getHandler());
             }
             else {
                 this._jqObject.bind(event+".CAD", this.getHandler());
@@ -109,12 +109,12 @@ CAD.prototype = {
             event.CAD = localCAD;
 
             // Let's get a list of all of the event handlers for this event and mode.
-            fns = ((localCAD.events[event.type] === undefined || 
+            var fns = ((localCAD.events[event.type] === undefined || 
                         localCAD.events[event.type][localCAD.mode] === undefined) ? [] : 
                             localCAD.events[event.type][localCAD.mode]);
 
             // These handlers will be executed for this event, no matter the mode.
-            always_fns = ((localCAD.events[event.type] === undefined || 
+            var always_fns = ((localCAD.events[event.type] === undefined || 
                                 localCAD.events[event.type][undefined] === undefined) ? [] : 
                                     localCAD.events[event.type][undefined]);
 
@@ -123,6 +123,7 @@ CAD.prototype = {
             // FIXME: Debug
             if (allF.length) console.log(event.type, localCAD.mode);
 
+            var fn;
             for (fn in allF) {
                 // If any of our events want to stop immediately, do so.
                 if (event.isImmediatePropagationStopped()) break;
@@ -130,7 +131,7 @@ CAD.prototype = {
                 // the containing div
                 allF[fn].call(localCAD._jqObject[0], event);
             }
-        }
+        };
     },
 
     // Return the type of an element
@@ -192,7 +193,7 @@ CAD.prototype = {
     // This creates a line from point1 to point2
     addLine: function (point1, point2) {
         // We shouldn't create lines that have no length.
-        if (point1 == point2) {
+        if (point1 === point2) {
             return undefined;
         }
 
@@ -250,7 +251,7 @@ $(function() {
     cad.bind(
         "click", function(event) {
             //FIXME: Deal with selection here.
-            if (event.CAD.elementType(event.target) == 'point') {
+            if (event.CAD.elementType(event.target) === 'point') {
                 return;
             }
 
@@ -313,10 +314,10 @@ $(function() {
             var target = event.target;
 
             // If we are placing our second point
-            if (c.drawingStatus.split(".")[0] == "drawing") {
+            if (c.drawingStatus.split(".")[0] === "drawing") {
                 c.changeDrawingStatus("none");
 
-                if (c.elementType(target) == 'point') {
+                if (c.elementType(target) === 'point') {
                     c.activeElement.end = c.getElement(target);
                 } else {
                     c.activeElement.end = c.addPoint(x, y);
@@ -326,7 +327,7 @@ $(function() {
                 c.addLine(c.activeElement.start, c.activeElement.end);
                 
                 // Don't chain if we end on an already existing point.
-                if (c.elementType(target) == 'point') return;
+                if (c.elementType(target) === 'point') return;
 
                 // This is for chaining the drawing of lines.
                 target = c.activeElement.end.node;
@@ -334,7 +335,7 @@ $(function() {
             // Time to start a new line! :D
             c.activeElement.type = "line";
 
-            if (c.elementType(target) == 'point') {
+            if (c.elementType(target) === 'point') {
                 c.changeDrawingStatus("drawing.connected");
                 c.activeElement.start = c.getElement(target);
             } else {
@@ -351,7 +352,7 @@ $(function() {
         "mousemove", function(event) {
             var c = event.CAD;
 
-            if (c.drawingStatus.split(".")[0] == "drawing") {
+            if (c.drawingStatus.split(".")[0] === "drawing") {
                 var offset = $(this).offset();
                 var x = (event.pageX - offset.left);
                 var y = (event.pageY - offset.top);
@@ -368,7 +369,7 @@ $(function() {
             var c = event.CAD;
             if (c.activeElement.type === "line") {
                 c.activeElement.type = "none";
-                if (c.drawingStatus.split == "drawing") {
+                if (c.drawingStatus === "drawing") {
                     c.activeElement.start.remove();
                 }
                 c.activeElement.line.remove();
@@ -381,12 +382,17 @@ $(function() {
     );
 
 
+    // We should always reset the drawing status when changing modes.
+    cad.bind("leaveMode", function(event) {
+        event.CAD.changeDrawingStatus("none");
+    });
+
+
     // The escape key should always send you to mode "select"
     cad.bind(
         "keydown", function(event) {
             // If it's the escape key, go to mode "select"
-            if (event.which == 27) {
-                event.CAD.changeDrawingStatus("none");
+            if (event.which === 27) {
                 event.CAD.changeMode("select");
             }
 
