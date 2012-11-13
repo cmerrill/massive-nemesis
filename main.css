@@ -53,10 +53,22 @@ div {
     stroke: rgb(100,100,230);
 }
 
+.point-drag {
+    fill: rgb(100,100,230);
+    stroke: transparent;
+    stroke-width: 3;
+    pointer-events: none;
+}
+
 .line {
     stroke: rgb(20,20,250); 
 }
 
 .line:hover {
     stroke-width: 2;
+}
+
+.line-drag {
+    stroke: rgb(20,20,250);
+    pointer-events: none;
 }

@@ -10,10 +10,28 @@
         <div id="container" class="cf">
             <h1 id="heading">window.CAD</h1>
             <div id="sidebar">
-                <h3>Sidebar goes here!</h3>
-                <span>This is a sidebar, I guess. Magic?</span>
-                <br><br>MODE:</br>
+                <h4>MODE:</h4>
                 <div id="mode-span"></div>
+                <h4>DRAWING STATUS:</h4>
+                <div id="draw-span"></div>
+                <h4>CHANGE MODE:</h4>
+                <ul>
+                    <li>
+                        <a href="javascript:cad.changeMode('select')">
+                            Select
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:cad.changeMode('draw.point')">
+                            Draw Point
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:cad.changeMode('draw.line')">
+                            Draw Line
+                        </a>
+                    </li>
+                </ul>
             </div>
             <div id="main-drawing-area" class="drawing-area"></div>
             <div id="footer"></div>
